@@ -1,29 +1,47 @@
 const TIME_INTERVAL = 5;
 const G = 60;
+const MARGIN = 8;
+
+let isMouseDown = false;
+let mouse_x = 0;
+let mouse_y = 0;
 
 window.onload = init;
+onmouseup = () => {isMouseDown = false;};
+onmousemove = function(e){mouse_x = e.clientX - MARGIN; mouse_y = e.clientY - MARGIN;}
 
 function init() {
   //velocities are in pixels per second
   const circle = {svg:null, x:16, y:16, r:16, v_x:0, v_y: 0, a_x:0, a_y:G};
   createCircle(circle);
   let svg = document.getElementById('svg');
+  svg.addEventListener('mousedown', () => {
+    isMouseDown = true;
+  });
   let bounds = [[0, svg.getAttribute('width')],[0, svg.getAttribute('height')]];
   let s = setInterval(simulate, TIME_INTERVAL, circle, bounds);
 }
 
 function simulate(circle, bounds) {
-  //update velocity based on acceleration
-  circle.v_x += (circle.a_x * (TIME_INTERVAL / 1000));
-  circle.v_y += (circle.a_y * (TIME_INTERVAL / 1000));
-  //update position based on velocity
-  circle.x += (circle.v_x * (TIME_INTERVAL / 1000));
-  circle.y += (circle.v_y * (TIME_INTERVAL / 1000));
-  //check if it hits the floor
-  //for now, make it completely stop once it hits the floor
-  if(circle.y > bounds[1][1] - circle.r) {
+  if(!isMouseDown){
+    //update velocity based on acceleration
+    circle.v_x += (circle.a_x * (TIME_INTERVAL / 1000));
+    circle.v_y += (circle.a_y * (TIME_INTERVAL / 1000));
+    //update position based on velocity
+    circle.x += (circle.v_x * (TIME_INTERVAL / 1000));
+    circle.y += (circle.v_y * (TIME_INTERVAL / 1000));
+    //check if it hits the floor
+    //for now, make it completely stop once it hits the floor
+    if(circle.y > bounds[1][1] - circle.r) {
+      circle.v_y = 0;
+      circle.a_y = 0;
+      circle.y = bounds[1][1] - circle.r;
+    }
+  } else {
+    circle.x = mouse_x;
+    circle.y = mouse_y;
+    circle.a_y = G;
     circle.v_y = 0;
-    circle.a_y = 0;
   }
   circle.svg.setAttribute('cx', circle.x);
   circle.svg.setAttribute('cy', circle.y);
