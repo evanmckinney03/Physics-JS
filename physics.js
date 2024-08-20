@@ -1,6 +1,8 @@
 const TIME_INTERVAL = 5;
 const G = 60;
 const MARGIN = 8;
+//value 0-1 that controls the velocity that the ball bounces back with
+const BOUNCE = 0.6;
 
 let isMouseDown = false;
 let mouse_x = 0;
@@ -31,11 +33,16 @@ function simulate(circle, bounds) {
     circle.x += (circle.v_x * (TIME_INTERVAL / 1000));
     circle.y += (circle.v_y * (TIME_INTERVAL / 1000));
     //check if it hits the floor
-    //for now, make it completely stop once it hits the floor
+    //make it bounce
     if(circle.y > bounds[1][1] - circle.r) {
-      circle.v_y = 0;
-      circle.a_y = 0;
       circle.y = bounds[1][1] - circle.r;
+      circle.v_y *= -1 * BOUNCE;
+      console.log(circle.v_y);
+      //if the velocity is slow enough, just completely stop it
+      if(Math.abs(circle.v_y) <= 0.1) {
+	circle.v_y = 0;
+	circle.a_y = 0;
+      }
     }
   } else {
     circle.x = mouse_x;
