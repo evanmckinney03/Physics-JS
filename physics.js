@@ -3,13 +3,17 @@ const TIME_INTERVAL = 5;
 window.onload = init;
 
 function init() {
-  const circle = {svg:null, x:0, y:0, r:16, v_x:40, v_y: 40};
+  //velocities are in pixels per second
+  const circle = {svg:null, x:16, y:16, r:16, v_x:0, v_y: 0, a_x:20, a_y:20};
   createCircle(circle);
   let s = setInterval(simulate, TIME_INTERVAL, circle);
 }
 
 function simulate(circle) {
-  //for now, move the circle with constant velocity
+  //update velocity based on acceleration
+  circle.v_x += (circle.a_x * (TIME_INTERVAL / 1000));
+  circle.v_y += (circle.a_y * (TIME_INTERVAL / 1000));
+  //update position based on velocity
   circle.x += (circle.v_x * (TIME_INTERVAL / 1000));
   circle.y += (circle.v_y * (TIME_INTERVAL / 1000));
   circle.svg.setAttribute('cx', circle.x);
