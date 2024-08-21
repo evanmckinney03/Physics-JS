@@ -1,5 +1,5 @@
 const TIME_INTERVAL = 5;
-const G = 60;
+const G = 80;
 const MARGIN = 8;
 //value 0-1 that controls the velocity that the ball bounces back with
 const BOUNCE = 0.6;
@@ -45,8 +45,8 @@ function simulate(circle, bounds) {
       }
     }
   } else {
-    circle.x = mouse_x;
-    circle.y = mouse_y;
+    circle.x = Math.min(Math.max(bounds[0][0] + circle.r, mouse_x), bounds[0][1] - circle.r);
+    circle.y = Math.min(Math.max(bounds[1][0] + circle.r, mouse_y), bounds[1][1] - circle.r);
     circle.a_y = G;
     circle.v_y = 0;
   }
