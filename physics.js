@@ -1,16 +1,25 @@
 const TIME_INTERVAL = 5;
-const G = 80;
+const G = 90;
 const MARGIN = 8;
 //value 0-1 that controls the velocity that the ball bounces back with
 const BOUNCE = 0.6;
+//value that determines how fast the ball moves when dragged
+const MOUSE_MULT = 20;
 
 let isMouseDown = false;
 let mouse_x = 0;
 let mouse_y = 0;
+let prev_mouse_x = 0;
+let prev_mouse_y = 0;
 
 window.onload = init;
 onmouseup = () => {isMouseDown = false;};
-onmousemove = function(e){mouse_x = e.clientX - MARGIN; mouse_y = e.clientY - MARGIN;}
+onmousemove = function(e){
+  prev_mouse_x = mouse_x;
+  prev_mouse_y = mouse_y;
+  mouse_x = e.clientX - MARGIN; 
+  mouse_y = e.clientY - MARGIN;
+}
 
 function init() {
   //velocities are in pixels per second
@@ -37,18 +46,44 @@ function simulate(circle, bounds) {
     if(circle.y > bounds[1][1] - circle.r) {
       circle.y = bounds[1][1] - circle.r;
       circle.v_y *= -1 * BOUNCE;
-      console.log(circle.v_y);
       //if the velocity is slow enough, just completely stop it
       if(Math.abs(circle.v_y) <= 0.1) {
 	circle.v_y = 0;
 	circle.a_y = 0;
       }
+    } else if(circle.y < bounds[1][0] + circle.r) {
+      circle.y = bounds[1][0] + circle.r;
+      circle.v_y *= -1 * BOUNCE;
+      //should still fall if it hits the top
+      if(Math.abs(circle.v_y) <= 0.1) {
+	circle.v_y = 0;
+      }
     }
+    //also check if it hit the left/right edge
+    if(circle.x > bounds[0][1] - circle.r) {
+      circle.x = bounds[0][1] - circle.r;
+      circle.v_x *= -1 * BOUNCE;
+      //if the velocity is slow enough, just completely stop it
+      if(Math.abs(circle.x_y) <= 0.1) {
+	circle.v_x = 0;
+	circle.a_x = 0;
+      }
+    } else if(circle.x < bounds[0][0] + circle.r) {
+      circle.x = bounds[0][0] + circle.r;
+      circle.v_x *= -1 * BOUNCE;
+      if(Math.abs(circle.v_x) <= 0.1) {
+	circle.v_x = 0;
+	circle.a_x = 0;
+      }
+    }
+    
   } else {
     circle.x = Math.min(Math.max(bounds[0][0] + circle.r, mouse_x), bounds[0][1] - circle.r);
     circle.y = Math.min(Math.max(bounds[1][0] + circle.r, mouse_y), bounds[1][1] - circle.r);
     circle.a_y = G;
-    circle.v_y = 0;
+    circle.v_y = (mouse_y - prev_mouse_y) * MOUSE_MULT;
+    circle.v_x = (mouse_x - prev_mouse_x) * MOUSE_MULT;
+    circle.a_x = 0;
   }
   circle.svg.setAttribute('cx', circle.x);
   circle.svg.setAttribute('cy', circle.y);
